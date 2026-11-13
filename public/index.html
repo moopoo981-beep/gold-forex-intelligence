@@ -1,1 +1,585 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <title>Gold & Forex Intelligence · V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f7f8fa; --surface:#fff; --ink:#17202b; --muted:#748091; --line:#e8ebef;
+      --soft:#f1f3f6; --green:#16845b; --red:#c34d4d; --amber:#a8751b;
+      --shadow:0 8px 28px rgba(24,36,52,.045); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",Inter,sans-serif;font-size:14px;line-height:1.65}
+    button{font:inherit;cursor:pointer}
+    .shell{max-width:1320px;margin:0 auto;padding:26px 26px 54px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:32px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-mark{width:38px;height:38px;display:grid;place-items:center;border:1px solid #dfe4e9;border-radius:12px;background:#fff;font:700 13px Inter,sans-serif;letter-spacing:-1px}
+    .brand-name{font:600 13px Inter,sans-serif;letter-spacing:.08em}
+    .brand-sub{color:var(--muted);font-size:10px;margin-top:1px;letter-spacing:.06em}
+    .live{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px #e5f3ed}
+    .hero{display:flex;justify-content:space-between;align-items:end;gap:22px;margin-bottom:19px}
+    .eyebrow,.kicker{color:var(--muted);font:600 10px Inter,sans-serif;letter-spacing:.15em;text-transform:uppercase}
+    h1{font-size:clamp(27px,4vw,37px);line-height:1.2;letter-spacing:-.04em;margin:7px 0 5px;font-weight:600}
+    .subtitle{color:var(--muted);font-size:12px}
+    .actions{display:flex;gap:9px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:11px;font-size:12px;font-weight:600;transition:.15s ease;box-shadow:0 2px 5px rgba(0,0,0,.02)}
+    .btn:hover{border-color:#cbd2da;transform:translateY(-1px)}
+    .btn.primary{background:#17202b;color:#fff;border-color:#17202b}
+    .btn:disabled{opacity:.5;cursor:wait;transform:none}
+    .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}
+    .metric,.panel,.news-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .metric{padding:16px 18px;min-height:105px}
+    .metric-label{color:var(--muted);font-size:10px;letter-spacing:.06em;margin-bottom:8px}
+    .metric-value{font:600 clamp(18px,2vw,23px) Inter,sans-serif;letter-spacing:-.035em;line-height:1.25}
+    .metric-note{color:var(--muted);font-size:10px;margin-top:5px}
+    .positive{color:var(--green)}.negative{color:var(--red)}.neutral{color:var(--amber)}
+    .layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.88fr);gap:15px;align-items:start}
+    .stack{display:flex;flex-direction:column;gap:15px;min-width:0}
+    .panel,.news-panel{padding:19px}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+    .panel-title{font-size:14px;font-weight:600;margin-top:2px}
+    .panel-sub{color:var(--muted);font-size:10px}
+    .tag{display:inline-flex;align-items:center;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;background:var(--soft);color:#677383;white-space:nowrap}
+    .tag.up{color:var(--green);background:#eaf5ef}.tag.down{color:var(--red);background:#fbefef}.tag.wait{color:var(--amber);background:#f8f2e7}
+    .chart-wrap{width:100%;height:260px;position:relative}
+    #goldChart{width:100%;height:100%;display:block;overflow:visible}
+    .chart-legend{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:3px}
+    .technical-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+    .tech{background:#f8f9fb;border:1px solid var(--line);border-radius:12px;padding:10px 11px;min-width:0}
+    .tech-label{color:var(--muted);font-size:9px;letter-spacing:.04em}
+    .tech-value{font:600 14px Inter,sans-serif;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .analysis-card{padding:13px 14px;border:1px solid var(--line);border-radius:13px;min-height:104px;background:#fff}
+    .analysis-card.wide{grid-column:1/-1;min-height:84px}
+    .analysis-card h3{margin:0 0 8px;font:600 9px Inter,sans-serif;letter-spacing:.1em;color:#647181}
+    .analysis-card p{margin:0;white-space:pre-wrap;color:#293442;font-size:11px;line-height:1.8}
+    .analysis-card .empty{color:#9aa3ad}
+    .status-line{color:var(--muted);font-size:10px;line-height:1.6}
+    .calendar-list,.news-list,.source-list{display:flex;flex-direction:column}
+    .event{display:grid;grid-template-columns:68px 1fr auto;gap:10px;align-items:start;padding:11px 0;border-top:1px solid var(--line)}
+    .event:first-child{border-top:0;padding-top:0}
+    .event-time{font:600 10px Inter,sans-serif;color:#4e5a68;padding-top:2px}
+    .event-title{font-size:11px;font-weight:600;line-height:1.5}
+    .event-meta{font-size:9px;color:var(--muted);margin-top:3px}
+    .impact{font-size:9px;padding:3px 7px;border-radius:20px;background:#f1f3f6;color:#687586}
+    .impact.high{background:#fbefef;color:var(--red)}.impact.medium{background:#f8f2e7;color:var(--amber)}
+    .note{padding:11px 12px;background:#f8f9fb;border:1px solid var(--line);border-radius:12px;color:#687586;font-size:10px;line-height:1.7}
+    .news-item{padding:12px 0;border-top:1px solid var(--line)}
+    .news-item:first-child{border-top:0;padding-top:0}
+    .news-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:center;color:var(--muted);font-size:9px;margin-bottom:4px}
+    .news-title{color:var(--ink);text-decoration:none;font-weight:600;font-size:11px;line-height:1.55}
+    .news-title:hover{text-decoration:underline;text-underline-offset:3px}
+    .news-summary{color:#687586;font-size:10px;margin-top:4px;line-height:1.65}
+    .source-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;color:#4d5968;font-size:10px;border-bottom:1px solid #f0f2f4}
+    .source-row:last-child{border-bottom:0}
+    .source-state{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:9px}
+    .source-state:before{content:"";width:6px;height:6px;border-radius:50%;background:#c4cbd3}
+    .source-state.ok:before{background:var(--green)}.source-state.fail:before{background:var(--red)}
+    .score-wrap{display:flex;align-items:center;gap:15px;margin:4px 0 13px}
+    .score-number{font:600 30px Inter,sans-serif;letter-spacing:-.05em}
+    .score-label{font-size:12px;font-weight:600}
+    .factor-list{display:flex;flex-direction:column;gap:7px}
+    .factor{display:flex;align-items:flex-start;gap:8px;color:#5d6876;font-size:10px;line-height:1.55}
+    .factor:before{content:"";width:5px;height:5px;border-radius:50%;background:#aab3bd;flex:0 0 auto;margin-top:6px}
+    .history-table{width:100%;border-collapse:collapse;font-size:10px}
+    .history-table th{text-align:left;color:var(--muted);font-weight:500;padding:8px 6px;border-bottom:1px solid var(--line)}
+    .history-table td{padding:9px 6px;border-bottom:1px solid #f0f2f4;white-space:nowrap}
+    .history-table tr:last-child td{border-bottom:0}
+    .loading{color:var(--muted);font-size:11px;padding:13px 0}
+    .error{color:var(--red);font-size:10px;padding:10px 0}
+    .foot{display:flex;justify-content:space-between;gap:14px;margin-top:18px;color:#929ba6;font-size:9px}
+    .hidden{display:none!important}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){
+      .shell{padding:17px 13px 35px}.topbar{margin-bottom:24px}.hero{align-items:start;flex-direction:column}
+      .actions{width:100%}.btn{flex:1}.metrics{gap:8px}.metric{padding:13px;min-height:91px}
+      .panel,.news-panel{padding:15px}.technical-grid{grid-template-columns:repeat(2,1fr)}
+      .analysis-grid{grid-template-columns:1fr}.analysis-card.wide{grid-column:auto}
+      .chart-wrap{height:215px}.event{grid-template-columns:58px 1fr auto;gap:7px}
+      .foot{flex-direction:column}.history-table{font-size:9px}
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">GFX</div>
+      <div>
+        <div class="brand-name">GOLD & FOREX INTELLIGENCE</div>
+        <div class="brand-sub">MACRO NEWS · MARKET DATA · AI ANALYSIS</div>
+      </div>
+    </div>
+    <div class="live"><span class="dot"></span><span id="connectionLabel">กำลังเชื่อมต่อข้อมูลตลาด</span></div>
+  </header>
 
+  <section class="hero">
+    <div>
+      <div class="eyebrow">PROFESSIONAL MARKET BRIEFING · V2.0</div>
+      <h1>Gold & Forex Dashboard</h1>
+      <div class="subtitle">ข้อมูลตลาด · ปัจจัยมหภาค · ปฏิทินเศรษฐกิจ · AI Trading Outlook</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="refreshBtn">↻ อัปเดตข้อมูล</button>
+      <button class="btn primary" id="analyzeBtn">วิเคราะห์ด้วย AI</button>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <div class="metric">
+      <div class="metric-label">XAU/USD · GOLD SPOT</div>
+      <div class="metric-value" id="goldPrice">—</div>
+      <div class="metric-note" id="goldChange">รอข้อมูลราคา</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">DXY · U.S. DOLLAR INDEX</div>
+      <div class="metric-value" id="dxyPrice">—</div>
+      <div class="metric-note" id="dxyChange">รอข้อมูลดอลลาร์</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">US 10Y TREASURY YIELD</div>
+      <div class="metric-value" id="yieldPrice">—</div>
+      <div class="metric-note" id="yieldChange">ข้อมูลรายวันจาก FRED</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">US 10Y REAL YIELD</div>
+      <div class="metric-value" id="realYieldPrice">—</div>
+      <div class="metric-note" id="realYieldChange">ข้อมูลรายวันจาก FRED</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">RULE-BASED GOLD BIAS</div>
+      <div class="metric-value neutral" id="biasMetric">WAIT</div>
+      <div class="metric-note" id="biasNote">รอข้อมูลให้ครบก่อนประเมิน</div>
+    </div>
+  </section>
+
+  <section class="layout">
+    <div class="stack">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">XAU/USD · PRICE STRUCTURE</div>
+            <div class="panel-title">กราฟทองคำย้อนหลัง 5 วัน</div>
+          </div>
+          <span class="tag" id="goldSourceTag">รอข้อมูล</span>
+        </div>
+        <div class="chart-wrap"><svg id="goldChart" viewBox="0 0 900 260" preserveAspectRatio="none" role="img" aria-label="Gold price chart"></svg></div>
+        <div class="chart-legend"><span id="chartStart">—</span><span id="chartEnd">—</span></div>
+        <div class="technical-grid">
+          <div class="tech"><div class="tech-label">RSI (14) · 30M</div><div class="tech-value" id="rsiValue">—</div></div>
+          <div class="tech"><div class="tech-label">SMA 20 · 30M</div><div class="tech-value" id="sma20Value">—</div></div>
+          <div class="tech"><div class="tech-label">SMA 50 · 30M</div><div class="tech-value" id="sma50Value">—</div></div>
+          <div class="tech"><div class="tech-label">24H HIGH / LOW</div><div class="tech-value" id="rangeValue">—</div></div>
+        </div>
+        <div class="status-line" id="marketUpdated" style="margin-top:12px">กำลังโหลดข้อมูลราคาและกราฟ…</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">AI MARKET READOUT</div>
+            <div class="panel-title">บทวิเคราะห์ประจำวัน</div>
+          </div>
+          <span class="tag wait" id="analysisBadge">ยังไม่วิเคราะห์</span>
+        </div>
+        <div class="status-line" id="analysisStatus">รอการวิเคราะห์จาก AI</div>
+        <div class="analysis-grid" id="analysisGrid" style="margin-top:13px">
+          <article class="analysis-card"><h3>MARKET OVERVIEW</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card"><h3>GOLD TREND</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card"><h3>USD IMPACT</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card"><h3>GEOPOLITICS</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card"><h3>GOLD SENTIMENT</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card"><h3>TECHNICAL CONTEXT</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+          <article class="analysis-card wide"><h3>ACTION PLAN</h3><p class="empty">รอข้อมูลข่าวและการวิเคราะห์</p></article>
+        </div>
+      </section>
+
+      <section class="news-panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">GLOBAL MACRO NEWS</div>
+            <div class="panel-title">ข่าวเศรษฐกิจและภูมิรัฐศาสตร์</div>
+          </div>
+          <span class="tag" id="newsBadge">AUTO RSS</span>
+        </div>
+        <div class="news-list" id="newsList"><div class="loading">กำลังดึงข่าวจากแหล่งข้อมูล…</div></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">ANALYSIS ARCHIVE</div>
+            <div class="panel-title">ประวัติการวิเคราะห์ย้อนหลัง</div>
+          </div>
+          <span class="tag">เก็บสูงสุด 180 รายการ</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="history-table">
+            <thead><tr><th>วันที่ / เวลา</th><th>XAU/USD</th><th>เปลี่ยนแปลง</th><th>BIAS</th><th>SCORE</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="5" class="loading">ยังไม่มีประวัติการวิเคราะห์</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <aside class="stack">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">MACRO SENTIMENT</div>
+            <div class="panel-title">แรงหนุนและแรงกดดันทองคำ</div>
+          </div>
+          <span class="tag" id="scoreTag">RULE BASED</span>
+        </div>
+        <div class="score-wrap">
+          <div class="score-number" id="scoreNumber">—</div>
+          <div><div class="score-label" id="scoreLabel">รอข้อมูล</div><div class="status-line">คะแนนจาก -5 ถึง +5</div></div>
+        </div>
+        <div class="factor-list" id="factorList"><div class="loading">รอข้อมูลตลาด</div></div>
+        <div class="note" style="margin-top:14px">คะแนนนี้เป็นตัวกรองเชิงกฎจากราคา, SMA, RSI, DXY และ US10Y ไม่ใช่ sentiment จากปริมาณคำสั่งซื้อขาย และไม่ใช่สัญญาณเข้าเทรด</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">ECONOMIC CALENDAR · USD</div>
+            <div class="panel-title">ปฏิทินเศรษฐกิจสหรัฐฯ</div>
+          </div>
+          <span class="tag">เวลาไทย</span>
+        </div>
+        <div class="calendar-list" id="calendarList"><div class="loading">กำลังโหลดปฏิทินเศรษฐกิจ…</div></div>
+        <div class="status-line" id="calendarNote" style="margin-top:11px">แหล่งข้อมูล: Forex Factory weekly feed</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">SOURCE MONITOR</div>
+            <div class="panel-title">สถานะแหล่งข้อมูล</div>
+          </div>
+        </div>
+        <div class="source-list" id="sourceList"><div class="loading">กำลังตรวจสอบแหล่งข้อมูล…</div></div>
+        <div class="note" style="margin-top:13px">Yahoo Finance chart feed เป็นแหล่งข้อมูลภายนอกที่ไม่ใช่ API สาธารณะที่รับประกันความต่อเนื่อง และอาจล่าช้า ส่วน US10Y / Real Yield จาก FRED เป็นข้อมูลรายวัน ไม่ใช่ราคาสด</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="kicker">SYSTEM STATUS</div>
+            <div class="panel-title">การทำงานอัตโนมัติ</div>
+          </div>
+        </div>
+        <div class="source-row"><span>ดึงข่าวอัตโนมัติ</span><span class="tag up">เปิด</span></div>
+        <div class="source-row"><span>อัปเดตข้อมูลตลาด</span><span>ทุก 60 วินาที</span></div>
+        <div class="source-row"><span>อัปเดตปฏิทิน</span><span>ทุก 60 นาที</span></div>
+        <div class="source-row"><span>AI Auto Analysis</span><span class="tag wait" id="autoAiStatus">ตรวจสอบ…</span></div>
+        <div class="note" style="margin-top:13px">AI จะวิเคราะห์เมื่อเปิดเว็บครั้งแรก และเมื่อมีข่าวใหม่ตามรอบที่ตั้งไว้ การเรียก OpenAI API อาจมีค่าใช้จ่ายตามการใช้งาน</div>
+      </section>
+    </aside>
+  </section>
+
+  <footer class="foot">
+    <span>GOLD & FOREX INTELLIGENCE · MINIMAL EDITION · V2.0</span>
+    <span id="footerTime">เวลาแสดงผล Asia/Bangkok</span>
+  </footer>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let marketData = null, currentNews = [], autoAnalyze = false, autoAnalyzeMinutes = 60, isAnalyzing = false, lastFingerprint = "", marketSources = [], newsSources = [];
+  const fmt = (value, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? "—" : Number(value).toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  const signed = (value, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? "—" : `${Number(value) > 0 ? "+" : ""}${fmt(value, digits)}`;
+  const thDate = (value, withYear = false) => {
+    if (!value) return "—";
+    return new Intl.DateTimeFormat("th-TH", { timeZone:"Asia/Bangkok", day:"2-digit", month:"short", ...(withYear ? {year:"numeric"} : {}), hour:"2-digit", minute:"2-digit" }).format(new Date(value));
+  };
+  const setText = (id, value) => { $(id).textContent = value; };
+  function setMetricChange(id, value, unit = "%") {
+    const el = $(id);
+    if (value === null || value === undefined || !Number.isFinite(Number(value))) { el.textContent = "ไม่มีข้อมูลการเปลี่ยนแปลง"; el.className = "metric-note"; return; }
+    el.textContent = `${signed(value, 2)}${unit} · 24H โดยประมาณ`;
+    el.className = "metric-note " + (Number(value) > 0 ? "positive" : Number(value) < 0 ? "negative" : "");
+  }
+
+  function renderChart(points = []) {
+    const svg = $("goldChart");
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    if (!points.length) {
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x","450"); text.setAttribute("y","130"); text.setAttribute("text-anchor","middle");
+      text.setAttribute("fill","#98a2ae"); text.setAttribute("font-size","14"); text.textContent = "ไม่มีข้อมูลกราฟ";
+      svg.appendChild(text); return;
+    }
+    const W = 900, H = 260, pad = {l:12,r:14,t:16,b:20};
+    const values = points.map(p => Number(p.close)).filter(Number.isFinite);
+    const min = Math.min(...values), max = Math.max(...values);
+    const span = max - min || Math.max(Math.abs(max)*0.001, 1);
+    const x = i => pad.l + (i / Math.max(points.length - 1, 1)) * (W - pad.l - pad.r);
+    const y = v => pad.t + ((max - v) / span) * (H - pad.t - pad.b);
+    for (let i=0;i<4;i++) {
+      const gy = pad.t + i * ((H-pad.t-pad.b)/3);
+      const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+      line.setAttribute("x1",pad.l);line.setAttribute("x2",W-pad.r);line.setAttribute("y1",gy);line.setAttribute("y2",gy);
+      line.setAttribute("stroke","#edf0f3");line.setAttribute("stroke-dasharray","3 5");svg.appendChild(line);
+    }
+    const d = points.map((p,i) => `${i===0?"M":"L"} ${x(i).toFixed(2)} ${y(Number(p.close)).toFixed(2)}`).join(" ");
+    const area = document.createElementNS("http://www.w3.org/2000/svg","path");
+    area.setAttribute("d", `${d} L ${x(points.length-1)} ${H-pad.b} L ${x(0)} ${H-pad.b} Z`);
+    area.setAttribute("fill","#eaf3ef");area.setAttribute("opacity",".8");svg.appendChild(area);
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d",d);path.setAttribute("fill","none");path.setAttribute("stroke","#16845b");path.setAttribute("stroke-width","2.7");
+    path.setAttribute("stroke-linecap","round");path.setAttribute("stroke-linejoin","round");svg.appendChild(path);
+    const last = points.at(-1);
+    const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circle.setAttribute("cx",x(points.length-1));circle.setAttribute("cy",y(Number(last.close)));circle.setAttribute("r","4.5");circle.setAttribute("fill","#16845b");circle.setAttribute("stroke","#fff");circle.setAttribute("stroke-width","2");svg.appendChild(circle);
+    setText("chartStart", thDate(points[0].time));
+    setText("chartEnd", thDate(points.at(-1).time));
+  }
+
+  function renderMarket(data) {
+    marketData = data;
+    if (data.gold) {
+      setText("goldPrice", "$" + fmt(data.gold.price, 2));
+      setMetricChange("goldChange", data.gold.percentChange);
+      $("goldSourceTag").textContent = data.gold.isProxy ? "GC=F · FUTURES PROXY" : (data.gold.source || "MARKET DATA");
+      $("goldSourceTag").className = data.gold.isProxy ? "tag wait" : "tag up";
+      renderChart(data.gold.candles || []);
+    } else {
+      setText("goldPrice","—");setText("goldChange","ไม่สามารถดึงราคา XAU/USD ได้");renderChart([]);
+    }
+    if (data.dxy) {
+      setText("dxyPrice",fmt(data.dxy.price,2));
+      setMetricChange("dxyChange",data.dxy.percentChange);
+    } else { setText("dxyPrice","—");setText("dxyChange","ไม่สามารถดึง DXY ได้"); }
+
+    if (data.us10y) {
+      setText("yieldPrice",fmt(data.us10y.value,2)+"%");
+      const change = data.us10y.change;
+      setText("yieldChange",`${change === null ? "—" : signed(change,2)+" pp"} · ${data.us10y.date}`);
+      $("yieldChange").className = "metric-note " + (change > 0 ? "negative" : change < 0 ? "positive" : "");
+    } else { setText("yieldPrice","—");setText("yieldChange","ไม่สามารถดึงข้อมูล FRED ได้"); }
+
+    if (data.realYield10y) {
+      setText("realYieldPrice",fmt(data.realYield10y.value,2)+"%");
+      const change = data.realYield10y.change;
+      setText("realYieldChange",`${change === null ? "—" : signed(change,2)+" pp"} · ${data.realYield10y.date}`);
+      $("realYieldChange").className = "metric-note " + (change > 0 ? "negative" : change < 0 ? "positive" : "");
+    } else { setText("realYieldPrice","—");setText("realYieldChange","ไม่สามารถดึงข้อมูล FRED ได้"); }
+
+    const tech = data.technical || {};
+    const bias = tech.bias || "NEUTRAL";
+    setText("biasMetric",bias);
+    $("biasMetric").className = "metric-value " + (bias==="BULLISH"?"positive":bias==="BEARISH"?"negative":"neutral");
+    setText("biasNote",`คะแนน ${signed(tech.score,0)} / 5 · rule-based`);
+    setText("rsiValue",tech.rsi14===null?"—":fmt(tech.rsi14,1));
+    setText("sma20Value",tech.sma20===null?"—":fmt(tech.sma20,2));
+    setText("sma50Value",tech.sma50===null?"—":fmt(tech.sma50,2));
+    setText("rangeValue",tech.high24!==null&&tech.low24!==null?`${fmt(tech.high24,1)} / ${fmt(tech.low24,1)}`:"—");
+    setText("marketUpdated",`ดึงข้อมูล ${thDate(data.fetchedAt,true)} · XAU ${thDate(data.gold?.updatedAt)} · DXY ${thDate(data.dxy?.updatedAt)} · US10Y ${data.us10y?.date||"—"} | เวลาไทย`);
+    setText("scoreNumber",signed(tech.score,0));
+    setText("scoreLabel",bias==="BULLISH"?"แรงหนุนทองคำมากกว่า":bias==="BEARISH"?"แรงกดดันทองคำมากกว่า":"ปัจจัยยังผสม / รอความชัดเจน");
+    $("scoreLabel").className = "score-label " + (bias==="BULLISH"?"positive":bias==="BEARISH"?"negative":"neutral");
+    $("scoreTag").textContent = "RULE BASED";
+    const factorRoot = $("factorList");factorRoot.replaceChildren();
+    (tech.factors || []).forEach(f => { const div=document.createElement("div");div.className="factor";div.textContent=f;factorRoot.append(div); });
+    if (!(tech.factors||[]).length) factorRoot.textContent = "ข้อมูลไม่ครบพอสำหรับคำนวณปัจจัย";
+    marketSources = [
+      {source:"XAU/USD · "+(data.gold?.source||"Unavailable"),ok:Boolean(data.gold)},
+      {source:"DXY · "+(data.dxy?.source||"Unavailable"),ok:Boolean(data.dxy)},
+      {source:"US10Y · FRED daily",ok:Boolean(data.us10y)},
+      {source:"US10Y real yield · FRED daily",ok:Boolean(data.realYield10y)}
+    ];
+    if (data.errors?.length) data.errors.forEach(e=>marketSources.push({source:e.name+" · "+e.error,ok:false}));
+    renderSources();
+  }
+
+  function renderSources() {
+    const root=$("sourceList");root.replaceChildren();
+    [...marketSources, ...newsSources].forEach(source=>{
+      const row=document.createElement("div");row.className="source-row";
+      const name=document.createElement("span");name.textContent=source.source;
+      const state=document.createElement("span");state.className="source-state "+(source.ok?"ok":"fail");state.textContent=source.ok?"เชื่อมต่อแล้ว":"ไม่สำเร็จ";
+      row.append(name,state);root.append(row);
+    });
+  }
+
+  function renderCalendar(data) {
+    const root=$("calendarList");root.replaceChildren();
+    const events=data.events||[];
+    if (!events.length) {
+      const empty=document.createElement("div");empty.className="loading";
+      empty.textContent=data.error?"โหลดปฏิทินไม่สำเร็จ":"ไม่มีรายการ USD ในช่วงเวลาที่ feed ส่งมา";
+      root.append(empty);
+    }
+    events.forEach(event=>{
+      const row=document.createElement("div");row.className="event";
+      const time=document.createElement("div");time.className="event-time";time.textContent=thDate(event.timestamp);
+      const body=document.createElement("div");
+      const title=document.createElement("div");title.className="event-title";title.textContent=event.title;
+      const meta=document.createElement("div");meta.className="event-meta";
+      meta.textContent=[event.forecast?`คาดการณ์ ${event.forecast}`:"",event.previous?`ก่อนหน้า ${event.previous}`:"",event.actual?`จริง ${event.actual}`:""].filter(Boolean).join(" · ")||"USD";
+      body.append(title,meta);
+      const impact=document.createElement("span");impact.className="impact "+String(event.impact).toLowerCase();impact.textContent=event.impact;
+      row.append(time,body,impact);root.append(row);
+    });
+    setText("calendarNote",data.note||`แหล่งข้อมูล: ${data.source} · อัปเดต ${thDate(data.fetchedAt)}`);
+  }
+
+  function renderNews(items=[]) {
+    const root=$("newsList");root.replaceChildren();
+    if (!items.length) {const empty=document.createElement("div");empty.className="loading";empty.textContent="ยังไม่พบข่าวที่ตรงกับตัวกรอง";root.append(empty);return;}
+    items.forEach(item=>{
+      const article=document.createElement("article");article.className="news-item";
+      const meta=document.createElement("div");meta.className="news-meta";
+      const source=document.createElement("span");source.textContent=item.source;
+      const cat=document.createElement("span");cat.className="tag";cat.textContent=item.category||"NEWS";
+      const date=document.createElement("span");date.textContent=thDate(item.publishedAt);
+      meta.append(source,cat,date);
+      const title=document.createElement("a");title.className="news-title";title.href=item.url;title.target="_blank";title.rel="noopener noreferrer";title.textContent=item.title;
+      const summary=document.createElement("div");summary.className="news-summary";summary.textContent=item.summary||"ไม่มีรายละเอียดเพิ่มเติม";
+      article.append(meta,title,summary);root.append(article);
+    });
+    setText("newsBadge",`AUTO RSS · ${items.length}`);
+  }
+
+  function renderAnalysis(text) {
+    const root=$("analysisGrid");root.replaceChildren();
+    const definitions=[
+      ["MARKET OVERVIEW","MARKET OVERVIEW",false],["GOLD TREND","GOLD TREND",false],
+      ["USD IMPACT","USD IMPACT",false],["GEOPOLITICS","GEOPOLITICS",false],
+      ["GOLD SENTIMENT","GOLD SENTIMENT",false],["TECHNICAL CONTEXT","TECHNICAL CONTEXT",false],
+      ["ACTION PLAN","ACTION PLAN",true]
+    ];
+    const sections={};let active=null;
+    for(const line of String(text||"").split(/\r?\n/)){
+      const upper=line.toUpperCase();
+      const found=definitions.find(([key])=>upper.includes(key));
+      if(found){active=found[0];sections[active]=[];}
+      else if(active)sections[active].push(line);
+    }
+    definitions.forEach(([key,title,wide])=>{
+      const card=document.createElement("article");card.className="analysis-card"+(wide?" wide":"");
+      const heading=document.createElement("h3");heading.textContent=title;
+      const body=document.createElement("p");const content=(sections[key]||[]).join("\n").trim();
+      body.textContent=content||"ไม่มีข้อมูลในส่วนนี้";if(!content)body.className="empty";
+      card.append(heading,body);root.append(card);
+    });
+    $("analysisBadge").textContent="วิเคราะห์แล้ว";$("analysisBadge").className="tag up";
+  }
+
+  function renderHistory(items=[]) {
+    const root=$("historyBody");root.replaceChildren();
+    if(!items.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.className="loading";td.textContent="ยังไม่มีประวัติการวิเคราะห์";tr.append(td);root.append(tr);return;}
+    items.forEach(item=>{
+      const tr=document.createElement("tr");
+      const cells=[
+        thDate(item.generatedAt),
+        item.goldPrice===null?"—":"$"+fmt(item.goldPrice,2),
+        item.goldChangePct===null?"—":signed(item.goldChangePct,2)+"%",
+        item.bias||"—",
+        item.score===null?"—":signed(item.score,0)
+      ];
+      cells.forEach((value,i)=>{const td=document.createElement("td");td.textContent=value;if(i===3)td.className=value==="BULLISH"?"positive":value==="BEARISH"?"negative":"neutral";tr.append(td);});
+      root.append(tr);
+    });
+  }
+
+  async function loadJson(url) {
+    const response=await fetch(url);const data=await response.json();
+    if(!response.ok)throw new Error(data.detail||data.error||"Request failed");
+    return data;
+  }
+  async function loadMarket(force=false) {
+    try {const data=await loadJson("/api/market"+(force?"?refresh=1":""));renderMarket(data);return data;}
+    catch(error){setText("marketUpdated","ดึงข้อมูลตลาดไม่สำเร็จ: "+error.message);return null;}
+  }
+  async function loadNews(force=false) {
+    try {
+      const data=await loadJson("/api/news"+(force?"?refresh=1":""));
+      currentNews=data.items||[];renderNews(currentNews);
+      newsSources=(data.sourceStatus||[]).map(source=>({source:"RSS · "+source.source,ok:Boolean(source.ok)}));
+      renderSources();
+      const fingerprint=currentNews.slice(0,12).map(x=>x.title).join("|");
+      const changed=Boolean(fingerprint&&fingerprint!==lastFingerprint);lastFingerprint=fingerprint;
+      return {changed};
+    } catch(error){$("newsList").textContent=error.message;return {changed:false};}
+  }
+  async function loadCalendar(force=false) {
+    try {const data=await loadJson("/api/calendar"+(force?"?refresh=1":""));renderCalendar(data);}
+    catch(error){$("calendarList").textContent=error.message;}
+  }
+  async function loadHistory() {
+    try {const data=await loadJson("/api/history");renderHistory(data.history||[]);}
+    catch(_){}
+  }
+  async function runAnalysis() {
+    if(isAnalyzing)return;
+    isAnalyzing=true;$("analyzeBtn").disabled=true;
+    setText("analysisStatus","AI กำลังประเมินข่าว ตัวเลขตลาด และความเสี่ยง…");
+    $("analysisBadge").textContent="กำลังวิเคราะห์";$("analysisBadge").className="tag wait";
+    try {
+      const response=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+      const data=await response.json();if(!response.ok)throw new Error(data.detail||data.error||"วิเคราะห์ไม่สำเร็จ");
+      renderAnalysis(data.analysis);setText("analysisStatus",`อัปเดต ${thDate(data.generatedAt,true)} · ข่าว ${data.newsCount} รายการ · ปฏิทิน ${data.calendarCount} รายการ · ${data.model}`);
+      if(data.market)renderMarket(data.market);
+      if(data.calendar)renderCalendar(data.calendar);
+      localStorage.setItem("gfx_last_auto_analysis",data.generatedAt);
+      await loadHistory();
+    } catch(error) {
+      setText("analysisStatus",error.message);$("analysisBadge").textContent="ต้องตรวจสอบ";$("analysisBadge").className="tag wait";
+    } finally {isAnalyzing=false;$("analyzeBtn").disabled=false;}
+  }
+
+  async function refreshAll(force=false) {
+    $("refreshBtn").disabled=true;
+    await Promise.all([loadMarket(force),loadNews(force),loadCalendar(force),loadHistory()]);
+    $("refreshBtn").disabled=false;
+    setText("connectionLabel","เชื่อมต่อแหล่งข้อมูลแล้ว");
+  }
+
+  async function boot() {
+    try {
+      const health=await loadJson("/api/health");
+      autoAnalyze=Boolean(health.aiConfigured && health.autoAnalyze);autoAnalyzeMinutes=Number(health.autoAnalyzeMinutes||60);
+      $("autoAiStatus").textContent=health.aiConfigured?(autoAnalyze?"เปิด · ทุก "+autoAnalyzeMinutes+" นาที":"ปิด"): "รอตั้งค่า API Key";
+      $("autoAiStatus").className=health.aiConfigured&&autoAnalyze?"tag up":"tag wait";
+      if(!health.aiConfigured)setText("analysisStatus","ดึงข้อมูลตลาดและข่าวได้ แต่ต้องเพิ่ม GEMINI_API_KEY ใน Environment Variables ของ Render เพื่อเปิด AI");
+      if(!health.twelveDataConfigured) {
+        // Yahoo fallback remains active. This is not a blocking setup requirement.
+      }
+    } catch(error) {setText("analysisStatus","เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ: "+error.message);}
+    await refreshAll(false);
+    if(autoAnalyze) {
+      const last=localStorage.getItem("gfx_last_auto_analysis");
+      const elapsed=last?Date.now()-new Date(last).getTime():Infinity;
+      if(elapsed>autoAnalyzeMinutes*60*1000 && currentNews.length) await runAnalysis();
+    }
+  }
+
+  $("refreshBtn").addEventListener("click",()=>refreshAll(true));
+  $("analyzeBtn").addEventListener("click",runAnalysis);
+  boot();
+
+  setInterval(()=>loadMarket(false),60*1000);
+  setInterval(async()=>{
+    const result=await loadNews(true);
+    if(autoAnalyze&&result.changed&&currentNews.length) {
+      const last=localStorage.getItem("gfx_last_auto_analysis");
+      const elapsed=last?Date.now()-new Date(last).getTime():Infinity;
+      if(elapsed>autoAnalyzeMinutes*60*1000) await runAnalysis();
+    }
+  },15*60*1000);
+  setInterval(()=>loadCalendar(true),60*60*1000);
+  setInterval(()=>loadHistory(),5*60*1000);
+  setText("footerTime","แสดงเวลา Asia/Bangkok · "+new Intl.DateTimeFormat("th-TH",{timeZone:"Asia/Bangkok",dateStyle:"medium"}).format(new Date()));
+</script>
+</body>
+</html>
