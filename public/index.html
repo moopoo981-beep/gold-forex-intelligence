@@ -135,7 +135,7 @@
 
   <section class="metrics">
     <div class="metric">
-      <div class="metric-label">XAU/USD · GOLD SPOT</div>
+      <div class="metric-label" id="goldMetricLabel">XAU/USD · GOLD SPOT</div>
       <div class="metric-value" id="goldPrice">—</div>
       <div class="metric-note" id="goldChange">รอข้อมูลราคา</div>
     </div>
@@ -349,10 +349,12 @@
     if (data.gold) {
       setText("goldPrice", "$" + fmt(data.gold.price, 2));
       setMetricChange("goldChange", data.gold.percentChange);
+      setText("goldMetricLabel", data.gold.isProxy ? "GOLD FUTURES · PROXY (GC=F)" : "XAU/USD · GOLD SPOT");
       $("goldSourceTag").textContent = data.gold.isProxy ? "GC=F · FUTURES PROXY" : (data.gold.source || "MARKET DATA");
       $("goldSourceTag").className = data.gold.isProxy ? "tag wait" : "tag up";
       renderChart(data.gold.candles || []);
     } else {
+      setText("goldMetricLabel","XAU/USD · UNAVAILABLE");
       setText("goldPrice","—");setText("goldChange","ไม่สามารถดึงราคา XAU/USD ได้");renderChart([]);
     }
     if (data.dxy) {
@@ -406,7 +408,9 @@
     [...marketSources, ...newsSources].forEach(source=>{
       const row=document.createElement("div");row.className="source-row";
       const name=document.createElement("span");name.textContent=source.source;
+      if(source.error) name.title=source.error;
       const state=document.createElement("span");state.className="source-state "+(source.ok?"ok":"fail");state.textContent=source.ok?"เชื่อมต่อแล้ว":"ไม่สำเร็จ";
+      if(source.error) state.title=source.error;
       row.append(name,state);root.append(row);
     });
   }
@@ -492,10 +496,18 @@
     });
   }
 
-  async function loadJson(url) {
-    const response=await fetch(url);const data=await response.json();
-    if(!response.ok)throw new Error(data.detail||data.error||"Request failed");
+  async function parseJsonResponse(response, label="API") {
+    const raw=await response.text();
+    if(!raw.trim()) throw new Error(`${label}: เซิร์ฟเวอร์ส่งคำตอบว่าง (HTTP ${response.status}). ตรวจสอบ Render Logs`);
+    let data;
+    try { data=JSON.parse(raw); }
+    catch { throw new Error(`${label}: คำตอบไม่ใช่ JSON (HTTP ${response.status}) · ${raw.slice(0,180)}`); }
+    if(!response.ok) throw new Error(data.detail||data.error||`${label}: HTTP ${response.status}`);
     return data;
+  }
+  async function loadJson(url) {
+    const response=await fetch(url);
+    return parseJsonResponse(response,url);
   }
   async function loadMarket(force=false) {
     try {const data=await loadJson("/api/market"+(force?"?refresh=1":""));renderMarket(data);return data;}
@@ -505,7 +517,7 @@
     try {
       const data=await loadJson("/api/news"+(force?"?refresh=1":""));
       currentNews=data.items||[];renderNews(currentNews);
-      newsSources=(data.sourceStatus||[]).map(source=>({source:"RSS · "+source.source,ok:Boolean(source.ok)}));
+      newsSources=(data.sourceStatus||[]).map(source=>({source:"RSS · "+source.source,ok:Boolean(source.ok),error:source.error||null}));
       renderSources();
       const fingerprint=currentNews.slice(0,12).map(x=>x.title).join("|");
       const changed=Boolean(fingerprint&&fingerprint!==lastFingerprint);lastFingerprint=fingerprint;
@@ -527,7 +539,7 @@
     $("analysisBadge").textContent="กำลังวิเคราะห์";$("analysisBadge").className="tag wait";
     try {
       const response=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-      const data=await response.json();if(!response.ok)throw new Error(data.detail||data.error||"วิเคราะห์ไม่สำเร็จ");
+      const data=await parseJsonResponse(response,"AI Analysis");
       renderAnalysis(data.analysis);setText("analysisStatus",`อัปเดต ${thDate(data.generatedAt,true)} · ข่าว ${data.newsCount} รายการ · ปฏิทิน ${data.calendarCount} รายการ · ${data.model}`);
       if(data.market)renderMarket(data.market);
       if(data.calendar)renderCalendar(data.calendar);
