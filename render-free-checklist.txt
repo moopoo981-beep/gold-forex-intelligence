@@ -1,0 +1,19 @@
+RENDER FREE DEPLOY CHECKLIST
+[ ] GitHub repo created as Private
+[ ] Project root has package.json, server.js, public/index.html
+[ ] .env NOT uploaded
+[ ] node_modules NOT uploaded
+[ ] Render Web Service selected
+[ ] Runtime Node
+[ ] Build command: npm install
+[ ] Start command: npm start
+[ ] Instance: Free
+[ ] NODE_ENV=production
+[ ] GEMINI_API_KEY set in Render only
+[ ] GEMINI_MODEL=gemini-3.8-flash
+[ ] DASHBOARD_PASSWORD set
+[ ] AUTO_ANALYZE=true
+[ ] Deploy status Live
+[ ] Website opens and Basic Auth works
+[ ] /api/health returns aiConfigured=true
+[ ] Manual AI analysis succeeds
