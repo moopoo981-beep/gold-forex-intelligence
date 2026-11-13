@@ -92,11 +92,14 @@ function isRelevant(item) {
 
 async function fetchJson(url, headers = {}, timeoutMs = 12000) {
   const response = await fetch(url, {
-    headers: { "User-Agent": "GoldForexIntelligence/2.0", ...headers },
+    headers: { "User-Agent": "GoldForexIntelligence/2.2", ...headers },
     signal: AbortSignal.timeout(timeoutMs)
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+  const raw = await response.text();
+  if (!response.ok) throw new Error(`HTTP ${response.status}${raw ? `: ${raw.slice(0, 240)}` : " (empty response)"}`);
+  if (!raw.trim()) throw new Error(`Empty response body (HTTP ${response.status})`);
+  try { return JSON.parse(raw); }
+  catch { throw new Error(`Invalid JSON response (HTTP ${response.status}): ${raw.slice(0, 240)}`); }
 }
 
 async function fetchText(url, timeoutMs = 12000) {
@@ -688,11 +691,31 @@ ${newsText || "ไม่มีข่าว RSS ที่ผ่านตัวก
       signal: AbortSignal.timeout(60000)
     });
 
-    const payload = await response.json();
+    const rawPayload = await response.text();
+    let payload = {};
+    if (rawPayload.trim()) {
+      try { payload = JSON.parse(rawPayload); }
+      catch {
+        console.error(`[AI] Gemini returned non-JSON body; HTTP ${response.status}: ${rawPayload.slice(0, 300)}`);
+        return res.status(502).json({
+          error: "Gemini ส่งข้อมูลกลับมาไม่ใช่ JSON",
+          detail: `HTTP ${response.status}; ${rawPayload.slice(0, 220) || "empty body"}`
+        });
+      }
+    } else if (response.ok) {
+      console.error(`[AI] Gemini returned an empty body; HTTP ${response.status}`);
+      return res.status(502).json({
+        error: "Gemini ไม่ส่งข้อมูลตอบกลับ",
+        detail: `Empty response body (HTTP ${response.status}). ตรวจสอบ Render Logs แล้วลองใหม่`
+      });
+    }
+
     if (!response.ok) {
+      const detail = payload.error?.message || `Gemini API returned HTTP ${response.status}. Check the API key, model access and Free Tier quota.`;
+      console.error(`[AI] Gemini API error HTTP ${response.status}: ${detail}`);
       return res.status(response.status).json({
         error: "Gemini analysis request failed.",
-        detail: payload.error?.message || "Gemini API returned an error. Check the API key, model availability and free-tier quota."
+        detail
       });
     }
 
@@ -730,7 +753,8 @@ ${newsText || "ไม่มีข่าว RSS ที่ผ่านตัวก
       model: GEMINI_MODEL
     });
   } catch (error) {
-    res.status(500).json({ error: "Analysis failed.", detail: error.message });
+    console.error("[AI] Analysis route failed:", error.stack || error.message);
+    res.status(500).json({ error: "Analysis failed.", detail: error.message || "Unknown server error" });
   }
 });
 
